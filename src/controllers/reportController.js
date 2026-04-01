@@ -452,8 +452,19 @@ const reportController = async (req, res) => {
         let officeOutSec;
 
         if (currentSchedule) {
-          officeInSec = getTimeInSeconds(currentSchedule.scheduleStartTime);
-          officeOutSec = getTimeInSeconds(currentSchedule.scheduleEndtTime);
+          // START TIME
+          if (currentSchedule.scheduleStartTime) {
+            officeInSec = getTimeInSeconds(currentSchedule.scheduleStartTime);
+          } else {
+            officeInSec = timeToSec(emp?.inTime);
+          }
+
+          // END TIME
+          if (currentSchedule.scheduleEndtTime) {
+            officeOutSec = getTimeInSeconds(currentSchedule.scheduleEndtTime);
+          } else {
+            officeOutSec = timeToSec(emp?.outTime);
+          }
         } else {
           officeInSec = timeToSec(emp?.inTime);
           officeOutSec = timeToSec(emp?.outTime);
