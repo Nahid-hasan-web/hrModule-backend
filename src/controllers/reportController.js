@@ -444,21 +444,21 @@ const reportController = async (req, res) => {
 
         // ---------------- FAST LOOKUP ----------------
         const currentSchedule = scheduleMap.get(normalizeDate(a.date));
-// ================= SCHEDULE NAME LOGIC =================
-if (currentSchedule) {
-  const start = normalizeDate(currentSchedule.scheduleFrom);
-  const end = normalizeDate(currentSchedule.scheduleTo);
-  const today = normalizeDate(a.date);
+        // ================= SCHEDULE NAME LOGIC =================
+        if (currentSchedule) {
+          const start = normalizeDate(currentSchedule.scheduleFrom);
+          const end = normalizeDate(currentSchedule.scheduleTo);
+          const today = normalizeDate(a.date);
 
-  // 1 day schedule
-  if (start === end) {
-    scheduleLabel = currentSchedule.scheduleName;
-  }
-  // multi day schedule → only first day
-  else if (today === start) {
-    scheduleLabel = currentSchedule.scheduleName;
-  }
-}
+          // 1 day schedule
+          if (start === end) {
+            scheduleLabel = currentSchedule.scheduleName;
+          }
+          // multi day schedule → only first day
+          else if (today === start) {
+            scheduleLabel = currentSchedule.scheduleName;
+          }
+        }
         // ---------------- MACHINE DATA ----------------
         const actualInSec = timeToSec(a.inTime);
         const actualOutSec = timeToSec(a.outTime);
@@ -543,14 +543,14 @@ if (currentSchedule) {
       const outTimeOut = rm
         ? to12Hour(a.outTime || "--")
         : to12Hour(a.outTime || "-");
-// ================= ADD SCHEDULE TO REMARK =================
-if (scheduleLabel) {
-  if (remarksText) {
-    remarksText = `${scheduleLabel} | ${remarksText}`;
-  } else {
-    remarksText = scheduleLabel;
-  }
-}
+      // ================= ADD SCHEDULE TO REMARK =================
+      if (scheduleLabel) {
+        if (remarksText) {
+          remarksText = `${scheduleLabel} | ${remarksText}`;
+        } else {
+          remarksText = scheduleLabel;
+        }
+      }
       rpt.reportTable.push({
         date: `${pad2(dt.getDate())}-${dt.toLocaleString("en-US", {
           month: "short",

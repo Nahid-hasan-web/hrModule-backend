@@ -11,17 +11,13 @@ const createLeave = async (req, res) => {
     // ------------- validaiton for required fields
     if (!leavetype || !startDate || !endDate) {return res.status(400).json({success_status: "failed",message:"Please provide all required fields: leavetype, startDate, endDate",}); }
 
-    //------------- checking existing leaves for same employee
-    // const emplyeeOnLeave =  await leaveModel.findOne({employeeId , startDate , endDate});
-    // if(emplyeeOnLeave){ return res.status(400).json({ success_status: "failed", message: "Employee already has a leave for the given dates" }); }
-
     //-------------  creating new leave
    await new leaveModel({
       leavetype, 
       startDate,
       endDate,
       reason,
-      // employeeId
+      employeeId
     }).save();
 
     res.status(200).json({ success_status: "success", message: "Leave created successfully",});
