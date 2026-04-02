@@ -103,6 +103,10 @@ const timeToSec = (t) => {
   if (isNaN(d.getTime())) return null;
   return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
 };
+// check schedule type (single or multi day)
+const isSameDate = (d1, d2) => {
+  return ymdLocal(new Date(d1)) === ymdLocal(new Date(d2));
+};
 
 // =======================================================
 // CONTROLLER
@@ -348,7 +352,7 @@ const reportController = async (req, res) => {
       let status = "";
       let remarksText = "";
       let approval = "";
-
+      let scheduleLabel = "";
       // ================= RULE PRIORITY =================
       // 1) remark ( status removed)
       // 2) custom holiday (show name,  NOT count)
@@ -440,7 +444,21 @@ const reportController = async (req, res) => {
 
         // ---------------- FAST LOOKUP ----------------
         const currentSchedule = scheduleMap.get(normalizeDate(a.date));
+// ================= SCHEDULE NAME LOGIC =================
+if (currentSchedule) {
+  const start = normalizeDate(currentSchedule.scheduleFrom);
+  const end = normalizeDate(currentSchedule.scheduleTo);
+  const today = normalizeDate(a.date);
 
+  // 1 day schedule
+  if (start === end) {
+    scheduleLabel = currentSchedule.scheduleName;
+  }
+  // multi day schedule → only first day
+  else if (today === start) {
+    scheduleLabel = currentSchedule.scheduleName;
+  }
+}
         // ---------------- MACHINE DATA ----------------
         const actualInSec = timeToSec(a.inTime);
         const actualOutSec = timeToSec(a.outTime);
@@ -525,7 +543,14 @@ const reportController = async (req, res) => {
       const outTimeOut = rm
         ? to12Hour(a.outTime || "--")
         : to12Hour(a.outTime || "-");
-
+// ================= ADD SCHEDULE TO REMARK =================
+if (scheduleLabel) {
+  if (remarksText) {
+    remarksText = `${scheduleLabel} | ${remarksText}`;
+  } else {
+    remarksText = scheduleLabel;
+  }
+}
       rpt.reportTable.push({
         date: `${pad2(dt.getDate())}-${dt.toLocaleString("en-US", {
           month: "short",
