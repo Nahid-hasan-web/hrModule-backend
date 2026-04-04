@@ -199,7 +199,7 @@ const renderReportPdfPage = (doc, report, ctx) => {
   doc.y = y + 8;
 
   /* ================= SUMMARY PART (FIXED + PAY DAY FITS) ================= */
-  doc.font("Times-Bold").fontSize(14).text("Summary", PAGE_LEFT, 603, {
+  doc.font("Times-Bold").fontSize(14).text("Summary", PAGE_LEFT, 551, {
     align: "center",
     width: CONTENT_W,
   });
@@ -207,7 +207,7 @@ const renderReportPdfPage = (doc, report, ctx) => {
   doc.moveDown(0.25);
 
   const sumX0 = PAGE_LEFT;
-  let sumY = 620 // ---------------------------- summery table margin top 
+  let sumY = 565 // ---------------------------- summery table margin top 
   const sh = 20;
 
   const sw = {
@@ -332,6 +332,8 @@ const drawCellVCenterOnly = (x, y, w, h, text, fontName, fontSize, padX = 1) => 
     String(salaryDeduct),
     String(payDay),
   ];
+
+  
   const widths = [sw.dept, sw.total, sw.working, sw.off, sw.la, sw.lwp, sw.lwop, sw.abs, sw.late, sw.sal, sw.pay];
 
   x = sumX0;
@@ -345,27 +347,28 @@ const drawCellVCenterOnly = (x, y, w, h, text, fontName, fontSize, padX = 1) => 
   sumY += sh;
 
   let hrX = sumX0;
+  const hrRowHeight = 622
   // ------- from hr cell
-  drawCellVCenterOnly(hrX, 677, sw.dept, 17, "From HR", "Times-Roman", 9.2);
+  drawCellVCenterOnly(hrX, hrRowHeight, sw.dept, 17, "From HR", "Times-Roman", 9.2);
   hrX += sw.dept;
 
   // -------- final summery cell
   const finalSummaryW = sw.total + sw.working + sw.off + sw.la + sw.lwp + sw.lwop;
-  drawCellVCenterOnly(hrX, 677, finalSummaryW, 17, "Final Summary", "Times-Bold", 9.2);
+  drawCellVCenterOnly(hrX, hrRowHeight, finalSummaryW, 17, "Final Summary", "Times-Bold", 9.2);
   hrX += finalSummaryW;
   // --------------- from hr ather row
-  drawCellVCenterOnly(hrX, 677, sw.abs, 17, "", "Times-Roman", 9.2); hrX += sw.abs;
-  drawCellVCenterOnly(hrX, 677, sw.late, 17, "", "Times-Roman", 9.2); hrX += sw.late;
-  drawCellVCenterOnly(hrX, 677, sw.sal, 17, "", "Times-Roman", 9.2); hrX += sw.sal;
-  drawCellVCenterOnly(hrX, 677, sw.pay, 17, "", "Times-Roman", 9.2);
+  drawCellVCenterOnly(hrX, hrRowHeight, sw.abs, 17, "", "Times-Roman", 9.2); hrX += sw.abs;
+  drawCellVCenterOnly(hrX, hrRowHeight, sw.late, 17, "", "Times-Roman", 9.2); hrX += sw.late;
+  drawCellVCenterOnly(hrX, hrRowHeight, sw.sal, 17, "", "Times-Roman", 9.2); hrX += sw.sal;
+  drawCellVCenterOnly(hrX, hrRowHeight, sw.pay, 17, "", "Times-Roman", 9.2);
 
   /* ================= NOTE ================= */
   doc.y = sumY + sh ;
 
 
 doc.font("Times-Bold").fontSize(9).text("Note: ", PAGE_LEFT, doc.y, { continued: true });
-
-doc.font("Times-Roman").text("(1) day’s salary will be ", { continued: true });
+doc.font("Times-Bold").text("(1)", { continued: true });
+doc.font("Times-Roman").text(" day’s salary will be ", { continued: true });
 doc.font("Times-Bold").text("deducted", { continued: true });
 doc.font("Times-Roman").text(" for ", { continued: true });
 doc.font("Times-Bold").text("(4)", { continued: true });
@@ -385,41 +388,80 @@ doc.font("Times-Bold").text("unauthorized absence.", {
 
   doc.moveDown(6.7);
 
-  /* ================= SIGNATURES (ONE ROW) ================= */
-  const sigY = 800;
-  const lineW = 120;
+ /* ================= SIGNATURES ================= */
+const sigY = 800;
+const lineW = 120;
 
-  const totalBlocks = 4;
-  const gap = (CONTENT_W - lineW * totalBlocks) / (totalBlocks - 1);
+/* -------- TOP (IT - LEFT) -------- */
+const leftX = PAGE_LEFT;
 
-  const xPositions = [
-    PAGE_LEFT,
-    PAGE_LEFT + (lineW + gap),
-    PAGE_LEFT + (lineW + gap) * 2,
-    PAGE_LEFT + (lineW + gap) * 3,
-  ];
+doc.moveTo(leftX, sigY - 95).lineTo(leftX + lineW, sigY - 95).stroke();
 
-  doc.moveTo(xPositions[0], sigY).lineTo(xPositions[0] + lineW, sigY).stroke();
-  doc.font("Times-Roman").fontSize(9.5).text("Verified by", xPositions[0], sigY + 4, {
-    width: lineW,
-    align: "center",
-  });
+doc.font("Times-Roman").fontSize(9.5).text("Prepared By", leftX, sigY - 90, {
+  width: lineW,
+  align: "center",
+});
 
-  doc.font("Times-Roman").fontSize(9.5).text("HR", xPositions[0], sigY + 16, {
-    width: lineW,
-    align: "center",
-  });
+doc.text("IT Dept", leftX, sigY - 75, {
+  width: lineW,
+  align: "center",
+});
+/* -------- BOTTOM (HR, ED, GD, MD) -------- */
+const totalBlocks = 4;
+const gap = (CONTENT_W - lineW * totalBlocks) / (totalBlocks - 1);
 
-  doc.moveTo(xPositions[1], sigY).lineTo(xPositions[1] + lineW, sigY).stroke();
-  doc.text("Prepared By\nIT Dept", xPositions[1], sigY + 4, { width: lineW, align: "center" });
+const xPositions = [
+  PAGE_LEFT,
+  PAGE_LEFT + (lineW + gap),
+  PAGE_LEFT + (lineW + gap) * 2,
+  PAGE_LEFT + (lineW + gap) * 3,
+];
 
-  doc.moveTo(xPositions[2], sigY).lineTo(xPositions[2] + lineW, sigY).stroke();
-  doc.font("Times-Bold").text("Jahan Sultana Khan", xPositions[2], sigY + 4, { width: lineW, align: "center" });
-  doc.font("Times-Roman").text("Group Director", xPositions[2], sigY + 15, { width: lineW, align: "center" });
+// HR
+doc.moveTo(xPositions[0], sigY).lineTo(xPositions[0] + lineW, sigY).stroke();
+doc.text("Verified by", xPositions[0], sigY + 4, { width: lineW, align: "center" });
+doc.text("HR", xPositions[0], sigY + 16, { width: lineW, align: "center" });
 
-  doc.moveTo(xPositions[3], sigY).lineTo(xPositions[3] + lineW, sigY).stroke();
-  doc.font("Times-Bold").text("Mukarram Husain Khan", xPositions[3], sigY + 4, { width: lineW, align: "center" });
-  doc.font("Times-Roman").text("Managing Director", xPositions[3], sigY + 15, { width: lineW, align: "center" });
+// ED
+doc.moveTo(xPositions[1], sigY).lineTo(xPositions[1] + lineW, sigY).stroke();
+doc.font("Times-Bold").text("Brig Gen Sayeedur Rahman", xPositions[1], sigY + 4, {
+  width: lineW,
+  align: "center",
+});
+doc.font("Times-Roman").text("Executive Director", xPositions[1], sigY + 16, {
+  width: lineW,
+  align: "center",
+});
+
+// GD
+doc.moveTo(xPositions[2], sigY).lineTo(xPositions[2] + lineW, sigY).stroke();
+doc.font("Times-Bold").text("Jahan Sultana Khan", xPositions[2], sigY + 4, {
+  width: lineW,
+  align: "center",
+});
+doc.font("Times-Roman").text("Group Director", xPositions[2], sigY + 16, {
+  width: lineW,
+  align: "center",
+});
+
+// MD
+doc.moveTo(xPositions[3], sigY).lineTo(xPositions[3] + lineW, sigY).stroke();
+doc.font("Times-Bold").text("Mukarram Husain Khan", xPositions[3], sigY + 4, {
+  width: lineW,
+  align: "center",
+});
+doc.font("Times-Roman").text("Managing Director", xPositions[3], sigY + 16, {
+  width: lineW,
+  align: "center",
+});
+
+
+
+
+
+
+
+
 };
 
 module.exports = { renderReportPdfPage };

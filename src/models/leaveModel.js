@@ -11,6 +11,10 @@ const leaveModeSchema = new mongoose.Schema(
       default:"withpay",
       enum: ["withpay", "withoutpay"],
     },
+    leaveAmmount: {
+      type: Number,
+      required: true,
+    },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     reason: { type: String, required: true },
@@ -18,8 +22,12 @@ const leaveModeSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: ["pending", "approved", "rejected"],
-      default: "pending",
+      default: "approved",
     },
+    remark:{
+      type:String,
+      default:"Leave"
+    }
   },
   { timestamps: true },
 );

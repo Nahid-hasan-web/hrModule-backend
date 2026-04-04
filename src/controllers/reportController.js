@@ -103,11 +103,30 @@ const timeToSec = (t) => {
   if (isNaN(d.getTime())) return null;
   return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
 };
-// check schedule type (single or multi day)
-const isSameDate = (d1, d2) => {
-  return ymdLocal(new Date(d1)) === ymdLocal(new Date(d2));
-};
 
+// ================= is on leave data
+const isDateInLeaveRange = (checkDate, leaveList = []) => {
+  const target = new Date(checkDate);
+  if (isNaN(target)) return null;
+
+  target.setHours(0, 0, 0, 0);
+
+  for (const lv of leaveList) {
+    const start = new Date(lv.startDate);
+    const end = new Date(lv.endDate);
+
+    if (isNaN(start) || isNaN(end)) continue;
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    if (target >= start && target <= end) {
+      return lv;
+    }
+  }
+
+  return null;
+};
 // =======================================================
 // CONTROLLER
 // =======================================================
@@ -352,7 +371,7 @@ const reportController = async (req, res) => {
       let status = "";
       let remarksText = "";
       let approval = "";
-      let scheduleLabel = "";
+
       // ================= RULE PRIORITY =================
       // 1) remark ( status removed)
       // 2) custom holiday (show name,  NOT count)
@@ -444,21 +463,7 @@ const reportController = async (req, res) => {
 
         // ---------------- FAST LOOKUP ----------------
         const currentSchedule = scheduleMap.get(normalizeDate(a.date));
-        // ================= SCHEDULE NAME LOGIC =================
-        if (currentSchedule) {
-          const start = normalizeDate(currentSchedule.scheduleFrom);
-          const end = normalizeDate(currentSchedule.scheduleTo);
-          const today = normalizeDate(a.date);
 
-          // 1 day schedule
-          if (start === end) {
-            scheduleLabel = currentSchedule.scheduleName;
-          }
-          // multi day schedule → only first day
-          else if (today === start) {
-            scheduleLabel = currentSchedule.scheduleName;
-          }
-        }
         // ---------------- MACHINE DATA ----------------
         const actualInSec = timeToSec(a.inTime);
         const actualOutSec = timeToSec(a.outTime);
@@ -466,19 +471,10 @@ const reportController = async (req, res) => {
         // ---------------- CHECK DATE ----------------
 
         // ---------------- DECIDE OFFICE TIME ----------------
-
         let officeInSec;
         let officeOutSec;
 
-        const isRamadanSchedule =
-          currentSchedule &&
-          currentSchedule.scheduleName &&
-          currentSchedule.scheduleName.toLowerCase().includes("ramadan");
-
-        if (emp?.employeeType === "STAFF" && isRamadanSchedule) {
-          officeInSec = timeToSec("08:30");
-          officeOutSec = timeToSec("15:30");
-        } else if (currentSchedule) {
+        if (currentSchedule) {
           // START TIME
           if (currentSchedule.scheduleStartTime) {
             officeInSec = getTimeInSeconds(currentSchedule.scheduleStartTime);
@@ -508,9 +504,25 @@ const reportController = async (req, res) => {
           actualOutSec < officeOutSec;
 
         // ---------------- STATUS ----------------
+        const employeeLeaves = leaveMap.get(eid) || [];
+        const matchedLeave = isDateInLeaveRange(a.date, employeeLeaves);
+
         if (a.isAbsent) {
-          status = "Absent";
-          rpt.summary.absent += 1;
+          if (matchedLeave) {
+            status = "Leave";
+            remarksText = matchedLeave.remark || "Leave";
+
+            rpt.summary.leaveApproved += 1;
+
+            if (matchedLeave.leavetype === "withpay") {
+              rpt.summary.leaveWithPay += 1;
+            } else if (matchedLeave.leavetype === "withoutpay") {
+              rpt.summary.leaveWithoutPay += 1;
+            }
+          } else {
+            status = "Absent";
+            rpt.summary.absent += 1;
+          }
         } else if (isLate && isEarly) {
           status = "Late & Early";
           rpt.summary.totalLateEarly += 2;
@@ -523,13 +535,13 @@ const reportController = async (req, res) => {
         }
 
         // DEBUG (remove later)
-        console.log({
-          rawDate: a.date,
-          normalized: normalizeDate(a.date),
-          currentSchedule: currentSchedule?.scheduleName || null,
-          isLate,
-          isEarly,
-        });
+        // console.log({
+        //   rawDate: a.date,
+        //   normalized: normalizeDate(a.date),
+        //   currentSchedule: currentSchedule?.scheduleName || null,
+        //   isLate,
+        //   isEarly,
+        // });
       }
       // ---------------- changing the time on 12 am pm formet
       const to12Hour = (time) => {
@@ -552,14 +564,7 @@ const reportController = async (req, res) => {
       const outTimeOut = rm
         ? to12Hour(a.outTime || "--")
         : to12Hour(a.outTime || "-");
-      // ================= ADD SCHEDULE TO REMARK =================
-      if (scheduleLabel) {
-        if (remarksText) {
-          remarksText = `${scheduleLabel} | ${remarksText}`;
-        } else {
-          remarksText = scheduleLabel;
-        }
-      }
+
       rpt.reportTable.push({
         date: `${pad2(dt.getDate())}-${dt.toLocaleString("en-US", {
           month: "short",
