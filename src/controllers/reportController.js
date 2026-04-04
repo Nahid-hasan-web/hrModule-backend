@@ -466,10 +466,19 @@ const reportController = async (req, res) => {
         // ---------------- CHECK DATE ----------------
 
         // ---------------- DECIDE OFFICE TIME ----------------
+
         let officeInSec;
         let officeOutSec;
 
-        if (currentSchedule) {
+        const isRamadanSchedule =
+          currentSchedule &&
+          currentSchedule.scheduleName &&
+          currentSchedule.scheduleName.toLowerCase().includes("ramadan");
+
+        if (emp?.employeeType === "STAFF" && isRamadanSchedule) {
+          officeInSec = timeToSec("08:30");
+          officeOutSec = timeToSec("15:30");
+        } else if (currentSchedule) {
           // START TIME
           if (currentSchedule.scheduleStartTime) {
             officeInSec = getTimeInSeconds(currentSchedule.scheduleStartTime);
