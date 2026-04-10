@@ -469,7 +469,7 @@ const reportController = async (req, res) => {
         const actualOutSec = timeToSec(a.outTime);
 
         // ---------------- CHECK DATE ----------------
-
+console.log(a.date, a.outTime, typeof a.outTime);
         // ---------------- DECIDE OFFICE TIME ----------------
         let officeInSec;
         let officeOutSec;
@@ -581,10 +581,9 @@ const reportController = async (req, res) => {
     const reports = Array.from(reportMap.values()).map((r) => {
       const lateDays = r.summary.totalLateEarly || 0;
       const lateDeduct = Math.floor(lateDays / 4);
-
       r.summary.salaryDeduct =
-        r.summary.leaveWithoutPay + r.summary.absent * 2 + lateDeduct;
-
+      r.summary.leaveWithoutPay + r.summary.absent * 2 + lateDeduct;
+      
       r.summary.payDay = r.summary.totalDaysInMonth - r.summary.salaryDeduct;
       if (r.summary.payDay < 0) r.summary.payDay = 0;
       return r;
@@ -627,13 +626,13 @@ const reportController = async (req, res) => {
     doc.pipe(res);
 
     const ctx = { year, month, lastDay: totalDaysInMonth, fridaySet };
-
     finalReports.forEach((r, i) => {
       renderReportPdfPage(doc, r, ctx);
       if (i < finalReports.length - 1) doc.addPage();
     });
-
+    
     doc.end();
+
   } catch (err) {
     console.error(err);
     res.status(500).json({

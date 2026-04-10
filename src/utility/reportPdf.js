@@ -207,7 +207,7 @@ const renderReportPdfPage = (doc, report, ctx) => {
   doc.moveDown(0.25);
 
   const sumX0 = PAGE_LEFT;
-  let sumY = 565 // ---------------------------- summery table margin top 
+  let sumY = 620 // ---------------------------- summery table margin top 
   const sh = 20;
 
   const sw = {
@@ -347,7 +347,7 @@ const drawCellVCenterOnly = (x, y, w, h, text, fontName, fontSize, padX = 1) => 
   sumY += sh;
 
   let hrX = sumX0;
-  const hrRowHeight = 622
+  const hrRowHeight = 677 // ---------------------------- HR table margin top 
   // ------- from hr cell
   drawCellVCenterOnly(hrX, hrRowHeight, sw.dept, 17, "From HR", "Times-Roman", 9.2);
   hrX += sw.dept;
