@@ -199,7 +199,7 @@ const renderReportPdfPage = (doc, report, ctx) => {
   doc.y = y + 8;
 
   /* ================= SUMMARY PART (FIXED + PAY DAY FITS) ================= */
-  doc.font("Times-Bold").fontSize(14).text("Summary", PAGE_LEFT, 551, {
+  doc.font("Times-Bold").fontSize(14).text("Summary", PAGE_LEFT, 601, {
     align: "center",
     width: CONTENT_W,
   });
@@ -368,7 +368,8 @@ const drawCellVCenterOnly = (x, y, w, h, text, fontName, fontSize, padX = 1) => 
 
 doc.font("Times-Bold").fontSize(9).text("Note: ", PAGE_LEFT, doc.y, { continued: true });
 doc.font("Times-Bold").text("(1)", { continued: true });
-doc.font("Times-Roman").text(" day’s salary will be ", { continued: true });
+doc.fillColor("black").text(" day’s salary will be ", { continued: true });
+
 doc.font("Times-Bold").text("deducted", { continued: true });
 doc.font("Times-Roman").text(" for ", { continued: true });
 doc.font("Times-Bold").text("(4)", { continued: true });
@@ -377,7 +378,9 @@ doc.font("Times-Roman").text(" late arrivals or early departures. ", { continued
 doc.font("Times-Bold").text("(2)", { continued: true });
 doc.font("Times-Roman").text(" days’ salary will be ", { continued: true });
 doc.font("Times-Bold").text("deducted", { continued: true });
-doc.font("Times-Roman").text(" for ", { continued: true });
+
+doc.fillColor("blue").font("Times-Roman").text(" for ", { continued: true });
+doc.fillColor("black")
 doc.font("Times-Bold").text("(1)", { continued: true });
 doc.font("Times-Roman").text(" day of ", { continued: true });
 doc.font("Times-Bold").text("unauthorized absence.", {
@@ -395,14 +398,14 @@ const lineW = 120;
 /* -------- TOP (IT - LEFT) -------- */
 const leftX = PAGE_LEFT;
 
-doc.moveTo(leftX, sigY - 95).lineTo(leftX + lineW, sigY - 95).stroke();
+doc.moveTo(leftX, sigY - 65).lineTo(leftX + lineW, sigY - 65).stroke();
 
-doc.font("Times-Roman").fontSize(9.5).text("Prepared By", leftX, sigY - 90, {
+doc.font("Times-Roman").fontSize(9.5).text("Prepared By", leftX, sigY - 60, {
   width: lineW,
   align: "center",
 });
 
-doc.text("IT Dept", leftX, sigY - 75, {
+doc.text("IT Dept", leftX, sigY - 50, {
   width: lineW,
   align: "center",
 });
@@ -453,16 +456,7 @@ doc.font("Times-Bold").text("Mukarram Husain Khan", xPositions[3], sigY + 4, {
 doc.font("Times-Roman").text("Managing Director", xPositions[3], sigY + 16, {
   width: lineW,
   align: "center",
-});
-
-
-
-
-
-
-
-
-};
+});};
 
 module.exports = { renderReportPdfPage };
 

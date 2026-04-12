@@ -12,7 +12,7 @@ const customMoHolidayModel = require("../models/customMoHolidayModel");
 const commonSchedule = require("../models/commonSchedule");
 
 // =======================================================
-// HELPERS
+                        // HELPERS
 // =======================================================
 const getDatesBetween = (startDate, endDate) => {
   const dates = [];
@@ -312,6 +312,7 @@ const reportController = async (req, res) => {
     const addedDateMap = new Map(); // eid -> Set(iso)
 
     for (const { a, dt, iso } of filteredAttendance) {
+      console.log(a)
       const eid = String(a.employeeId);
 
       if (!reportMap.has(eid)) {
@@ -469,7 +470,6 @@ const reportController = async (req, res) => {
         const actualOutSec = timeToSec(a.outTime);
 
         // ---------------- CHECK DATE ----------------
-console.log(a.date, a.outTime, typeof a.outTime);
         // ---------------- DECIDE OFFICE TIME ----------------
         let officeInSec;
         let officeOutSec;
