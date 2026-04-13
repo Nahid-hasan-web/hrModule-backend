@@ -12,7 +12,7 @@ const customMoHolidayModel = require("../models/customMoHolidayModel");
 const commonSchedule = require("../models/commonSchedule");
 
 // =======================================================
-                        // HELPERS
+// HELPERS
 // =======================================================
 const getDatesBetween = (startDate, endDate) => {
   const dates = [];
@@ -312,7 +312,7 @@ const reportController = async (req, res) => {
     const addedDateMap = new Map(); // eid -> Set(iso)
 
     for (const { a, dt, iso } of filteredAttendance) {
-      console.log(a)
+      console.log(a);
       const eid = String(a.employeeId);
 
       if (!reportMap.has(eid)) {
@@ -492,17 +492,16 @@ const reportController = async (req, res) => {
           officeInSec = timeToSec(emp?.inTime);
           officeOutSec = timeToSec(emp?.outTime);
         }
-        // ---------------- FINAL LOGIC ----------------
+        // ---------------- Late Early logic LOGIC ----------------
         const isLate =
-          actualInSec !== null &&
-          officeInSec !== null &&
-          actualInSec > officeInSec;
+          actualInSec === null
+            ? true
+            : officeInSec !== null && actualInSec > officeInSec;
 
         const isEarly =
-          actualOutSec !== null &&
-          officeOutSec !== null &&
-          actualOutSec < officeOutSec;
-
+          actualOutSec === null
+            ? true
+            : officeOutSec !== null && actualOutSec < officeOutSec;
         // ---------------- STATUS ----------------
         const employeeLeaves = leaveMap.get(eid) || [];
         const matchedLeave = isDateInLeaveRange(a.date, employeeLeaves);
@@ -582,8 +581,8 @@ const reportController = async (req, res) => {
       const lateDays = r.summary.totalLateEarly || 0;
       const lateDeduct = Math.floor(lateDays / 4);
       r.summary.salaryDeduct =
-      r.summary.leaveWithoutPay + r.summary.absent * 2 + lateDeduct;
-      
+        r.summary.leaveWithoutPay + r.summary.absent * 2 + lateDeduct;
+
       r.summary.payDay = r.summary.totalDaysInMonth - r.summary.salaryDeduct;
       if (r.summary.payDay < 0) r.summary.payDay = 0;
       return r;
@@ -630,9 +629,8 @@ const reportController = async (req, res) => {
       renderReportPdfPage(doc, r, ctx);
       if (i < finalReports.length - 1) doc.addPage();
     });
-    
-    doc.end();
 
+    doc.end();
   } catch (err) {
     console.error(err);
     res.status(500).json({
