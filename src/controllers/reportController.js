@@ -312,7 +312,6 @@ const reportController = async (req, res) => {
     const addedDateMap = new Map(); // eid -> Set(iso)
 
     for (const { a, dt, iso } of filteredAttendance) {
-      console.log(a);
       const eid = String(a.employeeId);
 
       if (!reportMap.has(eid)) {
@@ -464,25 +463,29 @@ const reportController = async (req, res) => {
 
         // ---------------- FAST LOOKUP ----------------
         const currentSchedule = scheduleMap.get(normalizeDate(a.date));
+        const isCommonSchedule =currentSchedule?.scheduleName? true : false
 
         // ---------------- MACHINE DATA ----------------
         const actualInSec = timeToSec(a.inTime);
         const actualOutSec = timeToSec(a.outTime);
 
         // ---------------- CHECK DATE ----------------
+        console.log({date:iso , isCommonSchedule})
         // ---------------- DECIDE OFFICE TIME ----------------
         let officeInSec;
         let officeOutSec;
 
         if (currentSchedule) {
-          // START TIME
           if (currentSchedule.scheduleStartTime) {
             officeInSec = getTimeInSeconds(currentSchedule.scheduleStartTime);
+
+            if (emp?.employeeType === "STAFF" && isCommonSchedule) {
+              officeInSec = Math.max(0, officeInSec - 30 * 60);
+            }
           } else {
             officeInSec = timeToSec(emp?.inTime);
           }
 
-          // END TIME
           if (currentSchedule.scheduleEndtTime) {
             officeOutSec = getTimeInSeconds(currentSchedule.scheduleEndtTime);
           } else {
@@ -532,7 +535,6 @@ const reportController = async (req, res) => {
           status = "Early";
           rpt.summary.totalLateEarly += 1;
         }
-
         // DEBUG (remove later)
         // console.log({
         //   rawDate: a.date,
