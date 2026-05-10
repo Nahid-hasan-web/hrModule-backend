@@ -13,7 +13,7 @@ const normalizeExcelTime = (value) => {
 
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
       2,
-      "0"
+      "0",
     )}`;
   }
 
@@ -21,8 +21,27 @@ const normalizeExcelTime = (value) => {
   return value.toString().trim();
 };
 
+const formatDate = (value) => {
+  if (!value) return "";
+
+  // if excel numeric date
+  if (typeof value === "number") {
+    const date = XLSX.SSF.parse_date_code(value);
+    return `${date.m}/${date.d}/${date.y}`;
+  }
+
+  // if string like 01-Nov-24
+  const d = new Date(value);
+  if (!isNaN(d)) {
+    return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+  }
+
+  return value;
+};
 const uploadSheetData = async (req, res) => {
   try {
+
+
     if (!req.file) {
       return res.status(400).json({ ok: false, message: "No file uploaded" });
     }
@@ -49,13 +68,13 @@ const uploadSheetData = async (req, res) => {
         row["Clock Out"],
         typeof row["Clock Out"],
         "=>",
-        outTime
+        outTime,
       );
 
       return {
         employeeId: row["AC-No."]?.toString().trim(),
         name: row["Name"]?.toString().trim(),
-        date: row["Date"]?.toString().trim(),
+        date: formatDate(row["Date"]),
         inTime,
         outTime,
         late: row["Late"] || null,
@@ -65,7 +84,9 @@ const uploadSheetData = async (req, res) => {
       };
     });
 
-    const validData = mappedData.filter((d) => d.employeeId && d.name && d.date);
+    const validData = mappedData.filter(
+      (d) => d.employeeId && d.name && d.date,
+    );
 
     const inserted = await attendanceDataModel.insertMany(validData, {
       ordered: false,

@@ -48,6 +48,7 @@ const createLeave = async (req, res) => {
     res
       .status(200)
       .json({
+        employeeId,
         success_status: "success",
         message: "Leave created successfully",
       });
@@ -55,7 +56,7 @@ const createLeave = async (req, res) => {
     console.error("create leave controller", err);
     res.status(500).json({
       success_status: "failed",
-      message: "Internal server error from  leaveController/createLeave",
+      message: `Internal server error from  leaveController/createLeave ${err}`,
     });
   }
 };

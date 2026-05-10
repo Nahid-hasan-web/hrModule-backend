@@ -379,7 +379,7 @@ doc.font("Times-Bold").text("(2)", { continued: true });
 doc.font("Times-Roman").text(" days’ salary will be ", { continued: true });
 doc.font("Times-Bold").text("deducted", { continued: true });
 
-doc.fillColor("blue").font("Times-Roman").text(" for ", { continued: true });
+doc.fillColor("black").font("Times-Roman").text(" for ", { continued: true });
 doc.fillColor("black")
 doc.font("Times-Bold").text("(1)", { continued: true });
 doc.font("Times-Roman").text(" day of ", { continued: true });
@@ -391,72 +391,73 @@ doc.font("Times-Bold").text("unauthorized absence.", {
 
   doc.moveDown(6.7);
 
- /* ================= SIGNATURES ================= */
-const sigY = 800;
-const lineW = 120;
 
-/* -------- TOP (IT - LEFT) -------- */
-const leftX = PAGE_LEFT;
+/* ================= SIGNATURES ================= */
 
-doc.moveTo(leftX, sigY - 65).lineTo(leftX + lineW, sigY - 65).stroke();
-
-doc.font("Times-Roman").fontSize(9.5).text("Prepared By", leftX, sigY - 60, {
-  width: lineW,
+/* ================= EMPLOYEE SIGNATURE ================= */
+doc.moveTo(PAGE_LEFT + 0, 745).lineTo(PAGE_LEFT + 105, 745).stroke();
+doc.font("Times-Roman").fontSize(9).text("Employee Signature", PAGE_LEFT + 0, 750, {
+  width: 105,
   align: "center",
 });
 
-doc.text("IT Dept", leftX, sigY - 50, {
-  width: lineW,
+/* ================= IT SIGNATURE ================= */
+doc.moveTo(PAGE_LEFT + 0, 805).lineTo(PAGE_LEFT + 105, 805).stroke();
+doc.font("Times-Roman").fontSize(8).text("Prepared By", PAGE_LEFT + 0, 810, {
+  width: 105,
   align: "center",
 });
-/* -------- BOTTOM (HR, ED, GD, MD) -------- */
-const totalBlocks = 4;
-const gap = (CONTENT_W - lineW * totalBlocks) / (totalBlocks - 1);
+doc.text("IT Dept", PAGE_LEFT + 0, 820, { width: 105, align: "center" });
 
-const xPositions = [
-  PAGE_LEFT,
-  PAGE_LEFT + (lineW + gap),
-  PAGE_LEFT + (lineW + gap) * 2,
-  PAGE_LEFT + (lineW + gap) * 3,
-];
-
-// HR
-doc.moveTo(xPositions[0], sigY).lineTo(xPositions[0] + lineW, sigY).stroke();
-doc.text("Verified by", xPositions[0], sigY + 4, { width: lineW, align: "center" });
-doc.text("HR", xPositions[0], sigY + 16, { width: lineW, align: "center" });
-
-// ED
-doc.moveTo(xPositions[1], sigY).lineTo(xPositions[1] + lineW, sigY).stroke();
-doc.font("Times-Bold").text("Brig Gen Sayeedur Rahman", xPositions[1], sigY + 4, {
-  width: lineW,
+/* ================= HR SIGNATURE ================= */
+doc.moveTo(PAGE_LEFT + 115, 805).lineTo(PAGE_LEFT + 220, 805).stroke();
+doc.font("Times-Roman").fontSize(8).text("Verified by", PAGE_LEFT + 115, 810, {
+  width: 105,
   align: "center",
 });
-doc.font("Times-Roman").text("Executive Director", xPositions[1], sigY + 16, {
-  width: lineW,
+doc.text("HR", PAGE_LEFT + 115, 820, { width: 105, align: "center" });
+
+/* ================= ED SIGNATURE ================= */
+doc.moveTo(PAGE_LEFT + 230, 805).lineTo(PAGE_LEFT + 335, 805).stroke();
+doc.font("Times-Bold").fontSize(8).text("Brig Gen Sayeedur Rahman", PAGE_LEFT + 230, 810, {
+  width: 105,
+  align: "center",
+});
+doc.font("Times-Roman").fontSize(8).text("Executive Director", PAGE_LEFT + 230, 820, {
+  width: 105,
   align: "center",
 });
 
-// GD
-doc.moveTo(xPositions[2], sigY).lineTo(xPositions[2] + lineW, sigY).stroke();
-doc.font("Times-Bold").text("Jahan Sultana Khan", xPositions[2], sigY + 4, {
-  width: lineW,
+/* ================= GD SIGNATURE ================= */
+doc.moveTo(PAGE_LEFT + 345, 805).lineTo(PAGE_LEFT + 450, 805).stroke();
+doc.font("Times-Bold").fontSize(8).text("Jahan Sultana Khan", PAGE_LEFT + 345, 810, {
+  width: 105,
   align: "center",
 });
-doc.font("Times-Roman").text("Group Director", xPositions[2], sigY + 16, {
-  width: lineW,
+doc.font("Times-Roman").fontSize(8).text("Group Director", PAGE_LEFT + 345, 820, {
+  width: 105,
   align: "center",
 });
 
-// MD
-doc.moveTo(xPositions[3], sigY).lineTo(xPositions[3] + lineW, sigY).stroke();
-doc.font("Times-Bold").text("Mukarram Husain Khan", xPositions[3], sigY + 4, {
-  width: lineW,
+/* ================= MD SIGNATURE ================= */
+doc.moveTo(PAGE_LEFT + 460, 805).lineTo(PAGE_LEFT + 565, 805).stroke();
+doc.font("Times-Bold").fontSize(8).text("Mukarram Husain Khan", PAGE_LEFT + 460, 810, {
+  width: 105,
   align: "center",
 });
-doc.font("Times-Roman").text("Managing Director", xPositions[3], sigY + 16, {
-  width: lineW,
+doc.font("Times-Roman").fontSize(8).text("Managing Director", PAGE_LEFT + 460, 820, {
+  width: 105,
   align: "center",
-});};
+});
+
+
+
+
+
+
+
+
+};
 
 module.exports = { renderReportPdfPage };
 
